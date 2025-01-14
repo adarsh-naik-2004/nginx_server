@@ -1,6 +1,6 @@
 /*
 Node Logger is a powerful tool that allows you to log messages to the console, file, or other destinations. It provides a simple and flexible API for logging messages, making it easy to debug and monitor your Node.js applications.
-Console logs are great for quick debugging, but they can be difficult to manage and analyze. In this tutorial, we will explore how to use the advanced Node Logger such as Winston and logger.
+Console logs are great for quick debugging, but they can be difficult to manage and analyze.
 */
 
 import { createLogger, format, transports } from "winston";
