@@ -1,0 +1,32 @@
+server: 
+  listen: 8000
+
+  workers: 6
+
+  forwards:
+    - id: endpoint1
+      url: https://localhost:8001
+
+    - id: endpoint2
+      url: https://localhost:8001
+
+    - id: endpoint3
+      url: https://localhost:8003
+
+  headers:
+    - key: x-forward-for
+      value: $remote_addr
+
+    - key: authorization
+      value: "Bearer xyz"
+
+  rules:
+    - path: /
+      forward: 
+        - endpoint1
+        - endpoint2
+
+    - path: /admin
+      forward: 
+        - endpoint3
+      
