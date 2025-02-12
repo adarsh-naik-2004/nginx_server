@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 const forwardSchema = z.object({
     id: z.string(),
-    url: z.string().url()
+    url: z.string()
 })
 
 const headerSchema = z.object({

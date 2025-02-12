@@ -1,7 +1,7 @@
 import { ConfigSchemaType, rootConfigSchema } from './config_schema';
 import cluster , {Worker} from 'node:cluster';
 import http from 'node:http'
-import { workerMessageSchema, WorkerMessageType, WorkerMessageReplyType } from './server_schema';
+import { workerMessageSchema, WorkerMessageType, WorkerMessageReplyType, workerMessageReplySchema } from './server_schema';
 
 
 interface CreateServerConfig {
@@ -43,6 +43,21 @@ export async function createServer(config: CreateServerConfig) {
             }
 
             worker.send(JSON.stringify(payload))
+
+            worker.on('message', async (workerReply:string) => {
+                const reply = await workerMessageReplySchema.parseAsync(JSON.parse(workerReply))
+
+                if(reply.errorCode){
+                    res.writeHead(parseInt(reply.errorCode))
+                    res.end(reply.error);
+                    return;
+                }
+                else{
+                    res.writeHead(200)
+                    res.end(reply.data)
+                    return;
+                }
+            })
         });
 
         server.listen(config.port, function(){
@@ -62,7 +77,7 @@ export async function createServer(config: CreateServerConfig) {
             const rule = config.server.rules.find(e => e.path === requestURL)
 
             const forwardID = rule?.forward[0]; // forwards
-
+            const forward = config.server.forwards.find(e => e.id === forwardID)
 
 
             if(!forwardID){
@@ -73,7 +88,22 @@ export async function createServer(config: CreateServerConfig) {
                 }
             }
 
-            
+            http.request({host: forward?.url, path: requestURL} , (proxyRes) => {
+                let body = '';
+
+                proxyRes.on('data',(chunk) => {
+                    body += chunk; // ek sath kyu nhi aata bhai mere
+                });
+
+                proxyRes.on('end', () => {
+                    const reply: WorkerMessageReplyType = {
+                        data:body,
+                    };
+                    if(process.send){
+                        return process.send(JSON.stringify(reply));
+                    }
+                })
+            })
     
         });
     }
