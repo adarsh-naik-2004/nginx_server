@@ -4,6 +4,33 @@ import http from 'node:http'
 import { workerMessageSchema, WorkerMessageType, WorkerMessageReplyType, workerMessageReplySchema } from './server_schema';
 
 
+let currentIndex = 0;
+const workerConnections: Map<number, number> = new Map();
+
+function getWorkerIndex(strategy: "random" | "round-robin" | "least-connections", workers: Worker[]): number {
+    if (strategy === "random") {
+        return Math.floor(Math.random() * workers.length);
+    } else if (strategy === "round-robin") {
+        currentIndex = (currentIndex + 1) % workers.length;
+        return currentIndex;
+    } else if (strategy === "least-connections") {
+        let minConnections = Infinity;
+        let minIndex = 0;
+        workers.forEach((worker, index) => {
+            const connections = workerConnections.get(index) || 0;
+            if (connections < minConnections) {
+                minConnections = connections;
+                minIndex = index;
+            }
+        });
+        workerConnections.set(minIndex, (workerConnections.get(minIndex) || 0) + 1);
+        return minIndex;
+    }
+    return 0;
+}
+
+
+
 interface CreateServerConfig {
     port: number;
     workerCount: number;
@@ -28,7 +55,7 @@ export async function createServer(config: CreateServerConfig) {
         }
 
         const server = http.createServer(function(req,res) {
-            const index = Math.floor(Math.random() * worker_pool.length);
+            const index = getWorkerIndex("round-robin", worker_pool);
             const worker = worker_pool.at(index) // workers
 
             if(!worker){
