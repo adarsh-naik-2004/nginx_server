@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,24 +7,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const commander_1 = require("commander");
-const config_1 = require("./config");
-const node_os_1 = __importDefault(require("node:os"));
-const server_1 = require("./server");
+import { program } from 'commander';
+import { parseConfig, validateConfig } from './config.js';
+import os from 'node:os';
+import { createServer } from './server.js';
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        commander_1.program
+        program
             .option('--config <path>', 'Path to the config file')
-            .parse(process.argv); // <-- This is important!
-        const options = commander_1.program.opts();
+            .parse(process.argv); // <-- This is important!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        const options = program.opts();
         if (options.config) {
-            const validatedConfig = yield (0, config_1.validateConfig)(yield (0, config_1.parseConfig)(options.config));
-            yield (0, server_1.createServer)({ port: validatedConfig.server.listen, workerCount: (_a = validatedConfig.server.workers) !== null && _a !== void 0 ? _a : node_os_1.default.cpus().length, config: validatedConfig });
+            const validatedConfig = yield validateConfig(yield parseConfig(options.config));
+            yield createServer({ port: validatedConfig.server.listen, workerCount: (_a = validatedConfig.server.workers) !== null && _a !== void 0 ? _a : os.cpus().length, config: validatedConfig });
         }
         else {
             console.error("Error: --config argument is required.");

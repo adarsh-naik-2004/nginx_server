@@ -1,10 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.workerMessageSchema = void 0;
-const zod_1 = require("zod");
-exports.workerMessageSchema = zod_1.z.object({
-    requestType: zod_1.z.enum(['HTTP']),
-    headers: zod_1.z.any(),
-    body: zod_1.z.any(),
-    url: zod_1.z.string(),
+import { z } from 'zod';
+export const workerMessageSchema = z.object({
+    requestType: z.enum(['HTTP']),
+    headers: z.any(),
+    body: z.any(),
+    url: z.string(),
+});
+export const workerMessageReplySchema = z.object({
+    data: z.string().optional(),
+    error: z.string().optional(),
+    errorCode: z.enum(['500', '404']).optional(),
 });

@@ -1,26 +1,23 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.rootConfigSchema = void 0;
-const zod_1 = require("zod");
-const forwardSchema = zod_1.z.object({
-    id: zod_1.z.string(),
-    url: zod_1.z.string().url()
+import { z } from 'zod';
+const forwardSchema = z.object({
+    id: z.string(),
+    url: z.string()
 });
-const headerSchema = zod_1.z.object({
-    key: zod_1.z.string(),
-    value: zod_1.z.string()
+const headerSchema = z.object({
+    key: z.string(),
+    value: z.string()
 });
-const ruleSchema = zod_1.z.object({
-    path: zod_1.z.string(),
-    forward: zod_1.z.array(zod_1.z.string())
+const ruleSchema = z.object({
+    path: z.string(),
+    forward: z.array(z.string())
 });
-const serverSchema = zod_1.z.object({
-    listen: zod_1.z.number(),
-    workers: zod_1.z.number().optional(),
-    forwards: zod_1.z.array(forwardSchema),
-    headers: zod_1.z.array(headerSchema).optional(),
-    rules: zod_1.z.array(ruleSchema)
+const serverSchema = z.object({
+    listen: z.number(),
+    workers: z.number().optional(),
+    forwards: z.array(forwardSchema),
+    headers: z.array(headerSchema).optional(),
+    rules: z.array(ruleSchema)
 });
-exports.rootConfigSchema = zod_1.z.object({
+export const rootConfigSchema = z.object({
     server: serverSchema
 });

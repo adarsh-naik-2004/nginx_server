@@ -1,14 +1,14 @@
 import { program } from 'commander';
-import { parseConfig, validateConfig } from './config';
+import { parseConfig, validateConfig } from './config.js';
 import os from 'node:os'
-import { ConfigSchemaType, rootConfigSchema } from './config_schema';
-import { createServer } from './server';
+import { ConfigSchemaType, rootConfigSchema } from './config_schema.js';
+import { createServer } from './server.js';
 
 
 async function main() {
     program
         .option('--config <path>', 'Path to the config file') 
-        .parse(process.argv); // <-- This is important!
+        .parse(process.argv); // <-- This is important!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     const options = program.opts();
 

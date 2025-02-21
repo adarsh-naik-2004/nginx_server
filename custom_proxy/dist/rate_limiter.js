@@ -7,19 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import fs from 'node:fs/promises';
-import { parse } from 'yaml';
-import { rootConfigSchema } from './config_schema.js';
-export function parseConfig(filepath) {
+import { Redis } from "ioredis";
+const redis = new Redis({ host: "127.0.0.1", port: 6379 });
+export function rateLimit(ip, limit, duration) {
     return __awaiter(this, void 0, void 0, function* () {
-        const configContent = yield fs.readFile(filepath, 'utf-8');
-        const confiParsed = parse(configContent);
-        return JSON.stringify(confiParsed);
-    });
-}
-export function validateConfig(config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const validateConfig = yield rootConfigSchema.parseAsync(JSON.parse(config));
-        return validateConfig;
+        const key = `rate-limit:${ip}`;
+        const current = yield redis.incr(key);
+        if (current === 1) {
+            yield redis.expire(key, duration);
+        }
+        return current <= limit;
     });
 }
