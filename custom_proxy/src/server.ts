@@ -50,7 +50,8 @@ interface CreateServerConfig {
 }
 
 export async function createServer(config: CreateServerConfig) {
-    const { workerCount, port } = config;
+    const { workerCount } = config;
+    const PORT = process.env.PORT || config.port; // ✅ Dynamic port for Railway
     const worker_pool: Worker[] = [];
 
     if (cluster.isPrimary) {
@@ -64,7 +65,7 @@ export async function createServer(config: CreateServerConfig) {
 
         const server = http.createServer(async function (req, res) {
             const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            const allowed = await rateLimit(ip as string, 10, 60);
+            const allowed = await rateLimit(ip as string, 1000, 60);
 
             if (!allowed) {
                 res.writeHead(429, { 'Content-Type': 'text/plain' });
@@ -110,8 +111,8 @@ export async function createServer(config: CreateServerConfig) {
             });
         });
 
-        server.listen(config.port, function () {
-            console.log(`Reverse Proxy listening on PORT ${port}`);
+        server.listen(PORT, function () {
+            console.log(`Reverse Proxy listening on PORT ${PORT}`);
         });
     } else {
         console.log('Worker Node is Running');
@@ -131,7 +132,6 @@ export async function createServer(config: CreateServerConfig) {
             const forwardIndex = Math.floor(Math.random() * rule.forward.length); // random forward-id
             const forwardID = rule.forward[forwardIndex];
             const forward = config.server.forwards.find(e => e.id === forwardID);
-
 
             if (!forward) {
                 const reply: WorkerMessageReplyType = { errorCode: '500', error: 'Forward not found' };

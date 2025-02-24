@@ -1,2 +1,4 @@
 ﻿node_modules/
-dist/
+custom_proxy/dist/
+
+custom_proxy/.env

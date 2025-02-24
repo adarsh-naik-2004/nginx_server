@@ -26,7 +26,7 @@ server:
         - endpoint1
         - endpoint2
 
-    - path: /test
+    - path: /admin
       forward: 
         - endpoint3
       
