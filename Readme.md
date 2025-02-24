@@ -51,43 +51,9 @@ cd reverse-proxy
 npm install
 ```
 
-## Play with config.yaml
-Modify the YAML configuration as per your needs:
-```yaml
-server: 
-  listen: 8000  
-  workers: 6  
 
-  forwards:
-    - id: endpoint1
-      url: https://jsonplaceholder.typicode.com
 
-    - id: endpoint2
-      url: https://jsonplaceholder.typicode.com/comments
-
-    - id: endpoint3
-      url: https://jsonplaceholder.typicode.com/todos
-
-  headers:
-    - key: x-forward-for
-      value: $remote_addr
-
-    - key: authorization
-      value: "Bearer xyz"
-
-  rules:
-    - path: /
-      forward: 
-        - endpoint1
-        - endpoint2
-
-    - path: /admin
-      forward: 
-        - endpoint3
-
-```
-
-### Configuration Options
+## Configuration Options
 
 | **Option**    | **Description** |
 |--------------|----------------|
@@ -98,7 +64,7 @@ server:
 | **`rules`** | Path-based routing rules defining how requests are forwarded |
 
 
-### Usage Example
+## Usage Example
 🔹 **Access through reverse proxy**  
 ```bash
 http://localhost:8000/
