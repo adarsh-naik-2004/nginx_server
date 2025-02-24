@@ -51,7 +51,7 @@ interface CreateServerConfig {
 
 export async function createServer(config: CreateServerConfig) {
     const { workerCount } = config;
-    const PORT = process.env.PORT || config.port; // ✅ Dynamic port for Railway
+    const PORT = process.env.PORT || config.port; 
     const worker_pool: Worker[] = [];
 
     if (cluster.isPrimary) {
@@ -65,7 +65,7 @@ export async function createServer(config: CreateServerConfig) {
 
         const server = http.createServer(async function (req, res) {
             const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            const allowed = await rateLimit(ip as string, 1000, 60);
+            const allowed = await rateLimit(ip as string, 10, 60);
 
             if (!allowed) {
                 res.writeHead(429, { 'Content-Type': 'text/plain' });
